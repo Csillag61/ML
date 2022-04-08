@@ -126,7 +126,7 @@ for k, v in k_rmse_results.items():
     plt.plot(x, y)
     plt.xlabel('k value')
     plt.ylabel('RMSE')
-    
+    #plt.clf()
 #Multivariate Model
 
 # Compute average RMSE across different `k` values for each feature.
@@ -179,7 +179,7 @@ for nr_best_feats in range(2,7):
     k_rmse_results['{} best features'.format(nr_best_feats)] = knn_train_test(
         sorted_features[:nr_best_feats],
         'price',
-        numeric_cars
+        num_cars
     )
 
 k_rmse_results
@@ -225,7 +225,7 @@ for nr_best_feats in range(2, 6):
     k_rmse_results['{} best features'.format(nr_best_feats)] = knn_train_test(
         sorted_features[:nr_best_feats],
         'price',
-        numeric_cars
+        num_cars
     )
 
 k_rmse_results
