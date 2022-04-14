@@ -213,3 +213,60 @@ second_term = np.dot(
     )
 ols_estimation = np.dot(first_term, second_term)
 print(ols_estimation)
+
+# feature engineering /  processing and trandforming features
+# select data with no missing values
+data = pd.read_csv('Ameshousing.txt', delimiter = '\t')
+train = data[0:1460]
+test = data[1460:0]
+train_null_counts= train.isnull().sum()
+df_no_mv = train[train_null_counts[train_null_counts == 0].index]
+
+#  categorical features groups a specific training example into a specific category
+
+# We can convert any column that contains no missing values (or an error will be thrown) to the categorical data type using the pandas.Series.astype() method
+
+# need to use the .cat accessor followed by the .codes property to actually access the underlying numerical representation of a column:
+## all text columns to the categorical datatype:
+
+text_cols = df_no_mv.select_dtypes(include=['object']).columns
+for col in text_cols:
+    print(col+":", len(train[col].unique()))
+for col in text_cols:
+    train[col] = train[col].astype('category')
+
+train['Utilities'].cat.codes.value_counts()
+
+#   The drawback with this approach is that one of the assumptions of linear regression is violated here. Linear regression operates under the assumption that the features are linearly correlated with the target column. For a categorical feature, however, there's no actual numerical meaning to the categorical codes that pandas assigned for that column
+
+# dummy coding : pandas.get_dummies
+
+dummy_cols = pd.DataFrame()
+
+for col in text_cols:
+    col_dummies = pd.get_dummies(train[col])
+    train = pd.concat([train, col_dummies], axis = 1)
+    del train[col]
+
+
+train['years_until_remod'] = train['Year Remod/Add'] - train['Year Built']   
+# missing values/imputation techniques
+## drop columns if 50% of the values is missing
+
+import pandas as pd
+
+data = pd.read_csv('AmesHousing.txt', delimiter="\t")
+train = data[0:1460]
+test = data[1460:]
+
+train_null_counts = train.isnull().sum()
+df_missing_values = train[train_null_counts[(train_null_counts>0) & (train_null_counts<584)].index]
+
+print(df_missing_values.isnull().sum())
+print(df_missing_values.dtypes)
+
+# For numerical columns with missing values, a common strategy is to compute the mean, median, or mode of each column and replace all missing values in that column with that value.
+
+float_cols = df_missing_values.select_dtypes(include=['float'])
+float_cols = float_cols.fillna(float_cols.mean())
+print(float_cols.isnull().sum())
